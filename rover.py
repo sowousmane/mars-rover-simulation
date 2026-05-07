@@ -1,3 +1,6 @@
+import logging
+
+
 def turn_left(direction):
     if direction == "N":
         return "W"
@@ -38,21 +41,49 @@ def move(x, y, direction, max_x, max_y):
         new_x += 1
     elif direction == "W":
         new_x -= 1
+    else:
+        raise ValueError(f"Invalid direction: {direction}")
 
     if is_inside(new_x, new_y, max_x, max_y):
+        logging.info(
+            "Mouvement applique: (%s, %s) -> (%s, %s)",
+            x, y, new_x, new_y
+        )
         return new_x, new_y
 
+    logging.info(
+        "Mouvement bloque par la limite du plateau: (%s, %s) reste inchange",
+        x, y
+    )
     return x, y
+
+
 
 def execute_commands(x, y, direction, commands, max_x, max_y):
     for cmd in commands:
+        logging.info("Commande en cours: %s", cmd)
+
         if cmd == "L":
+            old_direction = direction
             direction = turn_left(direction)
+            logging.info(
+                "Rotation gauche: %s -> %s",
+                old_direction, direction
+            )
 
         elif cmd == "R":
+            old_direction = direction
             direction = turn_right(direction)
+            logging.info(
+                "Rotation droite: %s -> %s",
+                old_direction, direction
+            )
 
         elif cmd == "M":
+            logging.info(
+                "Tentative de mouvement depuis (%s, %s) vers %s",
+                x, y, direction
+            )
             x, y = move(x, y, direction, max_x, max_y)
 
         else:
