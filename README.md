@@ -1,4 +1,4 @@
-# 🚀 Mars Rover Simulation (Python)
+# 🚀 SIMPLE Mars Rover Simulation (Python)
 
 A simple command-line simulation of Mars rovers moving on a grid-based plateau.
 
