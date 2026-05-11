@@ -1,7 +1,8 @@
+import argparse
 import logging
 import sys
 
-from simulation import run_simulation
+from mars_rover.simulation import Simulation
 
 
 def configure_logging(verbose=False):
@@ -28,43 +29,45 @@ def read_input_file(filename):
     return lines
 
 
-def parse_cli_args(args):
-    verbose = False
-    filtered_args = []
+def parse_args(args=None):
+    parser = argparse.ArgumentParser(
+        description="Simule les deplacements des rovers sur Mars."
+    )
+    parser.add_argument(
+        "input_file",
+        help="Chemin vers le fichier d'entree de la simulation."
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Active les logs detailles de la simulation."
+    )
+    return parser.parse_args(args)
 
-    for arg in args:
-        if arg == "--verbose":
-            verbose = True
-        else:
-            filtered_args.append(arg)
 
-    if len(filtered_args) != 1:
-        raise ValueError("Usage: python main.py [--verbose] <fichier_input>")
-
-    return filtered_args[0], verbose
-
-
-def main():
-    configure_logging()
+def main(args=None):
+    parsed_args = parse_args(args)
+    configure_logging(parsed_args.verbose)
 
     try:
-        filename, verbose = parse_cli_args(sys.argv[1:])
-        configure_logging(verbose)
-        lines = read_input_file(filename)
-        results = run_simulation(lines)
+        lines = read_input_file(parsed_args.input_file)
+        simulation = Simulation.from_lines(lines)
+        results = simulation.run()
 
         for result in results:
             print(result)
 
+        return 0
+
     except FileNotFoundError:
         logging.error("Fichier introuvable.")
         print("Erreur : fichier introuvable.", file=sys.stderr)
-        sys.exit(1)
+        return 1
     except ValueError as exc:
         logging.error("Entree invalide: %s", exc)
         print(f"Erreur : {exc}", file=sys.stderr)
-        sys.exit(1)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

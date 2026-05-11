@@ -1,12 +1,12 @@
-# Mars Rover Functions
+# Mars Rover Modules
 
-Petit projet Python procedurale autour du kata Mars Rover de la NASA.
+Petit projet Python autour du kata Mars Rover de la NASA, maintenant structure en modules et en programmation orientee objet.
 
 Le programme lit un fichier d'entree, simule les deplacements de rovers sur une grille et retourne leur position finale.
 
 ## Objectif
-- pratiquer une logique simple basee sur des fonctions
-- garder une architecture lisible sans classes
+- pratiquer une logique Python simple puis evoluer vers une architecture POO
+- organiser le code en modules clairs
 - valider les entrees proprement
 - ajouter des logs utiles pour le debug sans polluer la sortie normale
 
@@ -59,6 +59,12 @@ Mode verbeux avec logs detailles :
 python3 main.py --verbose input.txt
 ```
 
+Aide de la CLI :
+
+```bash
+python3 main.py --help
+```
+
 ## Comportement Des Sorties
 - `stdout` affiche uniquement le resultat final des rovers
 - `stderr` affiche les erreurs et, en mode `--verbose`, les logs techniques
@@ -109,10 +115,16 @@ Erreur : fichier introuvable.
 ```text
 Mars-rovers-functions/
 ├── main.py
-├── simulation.py
-├── rover.py
+├── mars_rover/
+│   ├── __init__.py
+│   ├── plateau.py
+│   ├── rover.py
+│   └── simulation.py
+├── tests/
+│   ├── test_plateau.py
+│   ├── test_rover.py
+│   └── test_simulation.py
 ├── input.txt
-├── test_rover.py
 ├── requirements.txt
 └── README.md
 ```
@@ -120,38 +132,47 @@ Mars-rovers-functions/
 ## Organisation Du Code
 `main.py`
 - point d'entree du programme
-- gestion des arguments CLI
+- gestion des arguments CLI avec `argparse`
 - configuration du logging
 - lecture du fichier
 - gestion des erreurs globales
 
-`simulation.py`
-- validation du format d'entree
-- parsing du plateau
-- parsing des positions des rovers
-- validation des commandes
-- orchestration de la simulation
+`mars_rover/plateau.py`
+- classe `Plateau`
+- validation des dimensions
+- verification des limites de la grille
 
-`rover.py`
+`mars_rover/rover.py`
+- classe `Rover`
 - rotation gauche et droite
 - deplacement sur le plateau
-- verification des limites
 - execution des commandes
 - logs etape par etape en mode verbeux
 
-## Fonctions Principales
-Dans `rover.py` :
-- `turn_left(direction)`
-- `turn_right(direction)`
-- `is_inside(x, y, max_x, max_y)`
-- `move(x, y, direction, max_x, max_y)`
-- `execute_commands(x, y, direction, commands, max_x, max_y)`
+`mars_rover/simulation.py`
+- classe `Simulation`
+- parsing du plateau
+- parsing des rovers
+- validation des commandes
+- orchestration de la simulation
 
-Dans `simulation.py` :
-- `parse_plateau(line)`
-- `parse_rover_position(line)`
-- `validate_commands(commands)`
-- `run_simulation(lines)`
+`tests/`
+- tests separes par module metier
+- meilleure lisibilite de la couverture fonctionnelle
+
+## Fonctions Principales
+Classes principales :
+- `Plateau(max_x, max_y)`
+- `Rover(x, y, direction, plateau)`
+- `Simulation(plateau)`
+
+Methodes importantes :
+- `Rover.turn_left()`
+- `Rover.turn_right()`
+- `Rover.move()`
+- `Rover.execute(commands)`
+- `Simulation.from_lines(lines)`
+- `Simulation.run()`
 
 ## Installer Les Dependances
 
@@ -169,15 +190,15 @@ Les tests couvrent notamment :
 - les rotations
 - le deplacement
 - le blocage a la bordure
+- la validation du plateau
 - l'execution de commandes
 - les erreurs de format d'entree
+- la nouvelle architecture POO
 
 ## CI
 Le projet contient une pipeline GitHub Actions dans `.github/workflows/ci.yml` pour executer les tests automatiquement.
 
 ## Pistes D'amelioration
-- remplacer les `if/elif` de rotation par une logique cyclique plus Pythonique
-- ajouter `argparse` pour une CLI plus propre
 - ajouter des tests sur les logs
 - ajouter un niveau `DEBUG`
-- faire ensuite une version orientee objet pour comparer avec l'approche fonctionnelle
+- ajouter une vraie gestion d'exceptions metier dediees
